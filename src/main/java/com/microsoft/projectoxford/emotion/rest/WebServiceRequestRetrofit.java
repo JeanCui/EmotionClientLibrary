@@ -26,13 +26,20 @@ public class WebServiceRequestRetrofit {
     private static final String headerKey = "ocp-apim-subscription-key";
     private Gson gson = new Gson();
 
+    public class EmotionRequestJson{
+        public String url;
+        public EmotionRequestJson(String url){
+            this.url = url;
+
+        }
+    }
     public interface EmotionService{
         @POST("emotion/v1.0/recognize")
         @Headers({
                 "Content-Type: application/json",
                 "Host: api.projectoxford.ai",
         })
-        Call<List<RecognizeResult>> emotionRequest(@Header(headerKey) String subkey, @Body EmotionRequestJsonType reqBodyJson);
+        Call<List<RecognizeResult>> emotionRequest(@Header(headerKey) String subkey, @Body EmotionRequestJson reqBodyJson);
 
         @POST("emotion/v1.0/recognize")
         @Headers({
@@ -44,6 +51,7 @@ public class WebServiceRequestRetrofit {
 
     }
 
+
     public WebServiceRequestRetrofit(String key) {
         this.subscriptionKey = key;
     }
@@ -52,7 +60,7 @@ public class WebServiceRequestRetrofit {
 
         List<RecognizeResult> results = null;
         boolean isStream = false;
-        EmotionRequestJsonType body;
+        EmotionRequestJson body;
 
         /*Set header*/
         if (contentType != null && !contentType.isEmpty()) {
@@ -81,7 +89,7 @@ public class WebServiceRequestRetrofit {
         try {
             if (!isStream) {
 
-                body = new EmotionRequestJsonType((String)data.get("url"));
+                body = new EmotionRequestJson((String)data.get("url"));
 
                 Call<List<RecognizeResult>> call = emotionService.emotionRequest(subscriptionKey, body);
                 results = call.execute().body();
